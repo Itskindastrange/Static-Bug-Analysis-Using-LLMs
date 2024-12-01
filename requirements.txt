@@ -1,0 +1,13 @@
+streamlit
+torch
+transformers
+pandas
+numpy
+scikit-learn
+matplotlib
+joblib
+tqdm
+google-generativeai
+cython
+grpcio
+grpcio-tools
