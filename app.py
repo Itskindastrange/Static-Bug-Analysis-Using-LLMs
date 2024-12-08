@@ -84,7 +84,7 @@ def predict_with_details(text, model, tokenizer, dataset, threshold=0.5):
 
 
 # Configure the Google GenAI API
-genai.configure(api_key="AIzaSyDlgqI_8LTujBMP1AC_XlpCaEfXx9Sxurg")
+genai.configure(api_key=" ")#add your own API key
 
 def get_vulnerable_code_snippets(geminput, genai_model_name="gemini-1.5-flash"):
     """
