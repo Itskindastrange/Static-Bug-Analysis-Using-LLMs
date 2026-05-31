@@ -1,67 +1,81 @@
-# Static Bug Analysis using BERT & Gemini API
+# Static Bug Analysis Agent
 
-This project performs **static bug analysis** on code snippets by using a **BERT-based model** to detect vulnerabilities and danger levels, followed by querying the **Gemini API** for suggested fixes.
+A two-stage static code analysis pipeline that detects vulnerabilities 
+and suggests fixes — without running the code.
 
-## Requirements
+**Stage 1:** A fine-tuned BERT model classifies code snippets by 
+vulnerability type (multi-label) and danger level (Critical, High, etc.)
 
-- **Python 3.6+**
-- **PyTorch**
-- **Transformers** (for BERT)
-- **Scikit-learn**
-- **NumPy**
-- **tqdm**
-- **requests** (for Gemini API interaction)
+**Stage 2:** Detected vulnerabilities are passed to the Gemini API, 
+which generates targeted fix suggestions for each issue found.
 
-Install dependencies:
+---
+
+## How It Works
+
+Code Snippet → BERT Classifier → Vulnerability Labels + Danger Level
+↓
+Gemini API → Fix Suggestions
+
+
+---
+
+## Example
+
+Input — a SQL injection vulnerability:
+
+```python
+query = f"SELECT * FROM users WHERE id = {user_id}"
+```
+
+Output:
+Predicted Vulnerabilities: ['SQL Injection', 'Input Validation']
+Predicted Danger Level: Critical
+Suggested Fix: Use parameterized queries — cursor.execute(
+"SELECT * FROM users WHERE id = ?", (user_id,))
+
+
+---
+
+## Stack
+
+- **Model:** BERT (fine-tuned, PyTorch + HuggingFace Transformers)
+- **Classification:** Multi-label vulnerability detection + danger level classification
+- **Fix Generation:** Gemini API
+- **Training:** Dynamic thresholding based on model performance
+
+---
+
+## Setup
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Dataset
+1. Train the model:
+```bash
+python train.py
+```
 
-The dataset (`data.json`) should have the following columns:
-- `specific_code`: Code snippets for analysis.
-- `vulnerability_type`: Comma-separated list of vulnerabilities (multi-label).
-- `danger_level`: A single danger level (e.g., `Critical`, `High`).
+2. Run predictions on your code snippet — see `predict.py`
 
-## Setup
+3. Add your Gemini API key to `.env` to enable fix suggestions
 
-1. **Train the Model**: Train the model using the provided training script:
-   
-   ```bash
-   python train.py
-   ```
+---
 
-2. **Predict Vulnerabilities & Danger Level**:
-   
-   Example code to predict vulnerabilities and get suggestions:
+## Dataset Format
 
-   ```python
-   test_code = """
-   # Vulnerable code: SQL Injection
-   @app.route('/get_user', methods=['GET'])
-   def get_user():
-       user_id = request.args.get('user_id')
-       conn = sqlite3.connect('example.db')
-       cursor = conn.cursor()
-       query = f"SELECT * FROM users WHERE id = {user_id}"
-       cursor.execute(query)
-       user = cursor.fetchone()
-       return str(user)
-   """
-   vul_labels, danger_label = predict(test_code, model, tokenizer)
-   print("Predicted Vulnerabilities:", vul_labels)
-   print("Predicted Danger Level:", danger_label)
-   ```
+`data.json` expects:
 
-3. **Query Gemini API for Fix Suggestions**:
+| Field | Description |
+|---|---|
+| `specific_code` | Raw code snippet |
+| `vulnerability_type` | Comma-separated vulnerability labels |
+| `danger_level` | Single label: Critical, High, Medium, Low |
 
-   Add you API Key to get suggestions
+---
 
-## Training & Fine-Tuning
+## Built By
 
-- **BERT-based Model**: Fine-tuned to detect vulnerabilities and classify danger levels.
-- **Dynamic Thresholding**: Adjusts detection thresholds based on model performance.
-
-
+[Abdullah Ahmad](https://abdullahahmaddd.vercel.app) · 
+[LinkedIn](https://linkedin.com/in/abdullahahmd)
